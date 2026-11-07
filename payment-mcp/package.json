@@ -1,0 +1,34 @@
+{
+  "name": "near-payment-mcp",
+  "version": "0.2.0",
+  "description": "Pays approved purchase orders from the supplier-inventory MCP on NEAR (public testnet rail, confidential mainnet rail).",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.ts\"",
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts",
+    "login": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts login",
+    "whoami": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts whoami",
+    "logout": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts logout",
+    "shield": "NEAR_NETWORK=mainnet node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts shield",
+    "setup-check": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts setup-check",
+    "seed:demo-brewery": "node --disable-warning=ExperimentalWarning scripts/seed-demo-brewery.ts",
+    "pack:mcpb": "scripts/pack-mcpb.sh",
+    "balance": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts balance",
+    "test:e2e": "E2E=1 node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local --test --test-concurrency=1 test/e2e/local-demo.test.ts",
+    "test:e2e:mainnet": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local --test --test-concurrency=1 test/e2e/confidential-mainnet.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "near-api-js": "^7.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2"
+  }
+}

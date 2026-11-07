@@ -1,0 +1,75 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "name": "near-payment-mcp",
+  "display_name": "NEAR Supplier Payments",
+  "version": "0.2.1",
+  "description": "Pays approved purchase orders from the supplier-inventory MCP privately on NEAR, in USDC.",
+  "long_description": "Claude passes only a purchase-order id: the payee, token and amount come straight from the supplier server and are checked against this extension's own limits before anything is paid. Payments are made with NEAR Confidential Intents, so supplier prices and payees are not public. Set-up happens in the chat: run payment_setup_check and follow its next step (create a wallet, fund it with USDC from Base, Arbitrum, Solana and others, sign in to the supplier server). Keys never go into the chat.",
+  "author": { "name": "Project Contributors" },
+  "keywords": ["near", "payments", "procurement", "usdc", "confidential"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/extension.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/extension.mjs"],
+      "env": {
+        "NEAR_NETWORK": "mainnet",
+        "SUPPLY_URL": "${user_config.supply_url}",
+        "SUPPLY_API_KEY": "${user_config.supply_sign_in_key}",
+        "ONECLICK_API_KEY": "${user_config.oneclick_api_key}",
+        "MAINNET_PAYER_ACCOUNT": "${user_config.payer_account}",
+        "MAINNET_PAYER_PRIVATE_KEY": "${user_config.payer_private_key}",
+        "PER_PAYMENT_CAP": "${user_config.per_payment_cap}",
+        "DAILY_CAP": "${user_config.daily_cap}"
+      }
+    }
+  },
+  "tools": [
+    { "name": "payment_setup_check", "description": "Checks the set-up and says what to do next." },
+    { "name": "payment_sign_in", "description": "Opens the supplier server's sign-in page for this payment server's own session (never approve)." },
+    { "name": "wallet_create", "description": "Creates the payer wallet; its key stays on this computer." },
+    { "name": "wallet_fund", "description": "A deposit address to fund the private balance with USDC from another chain." },
+    { "name": "wallet_fund_status", "description": "Status of a funding deposit and the private balance." },
+    { "name": "payment_preview", "description": "What would be paid for a PO and why it might be refused. Changes nothing." },
+    { "name": "payment_pay", "description": "Pays an approved PO in full and records it on the PO. Never pays twice." },
+    { "name": "payment_status", "description": "Payment attempts for a PO." },
+    { "name": "payment_reconcile", "description": "Finishes interrupted payments; never starts new ones." },
+    { "name": "wallet_balance", "description": "Private balance, today's spend and the limits." }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=24.0.0" }
+  },
+  "user_config": {
+    "oneclick_api_key": {
+      "type": "string", "title": "NEAR Intents API key", "sensitive": true, "required": false,
+      "description": "Needed to pay privately. Get one free at partners.near-intents.org (key type \"1Click API\")."
+    },
+    "supply_url": {
+      "type": "string", "title": "Supplier server", "required": false, "default": "http://127.0.0.1:8790",
+      "description": "The supplier-inventory server your company uses."
+    },
+    "supply_sign_in_key": {
+      "type": "string", "title": "Payments sign-in key (optional)", "sensitive": true, "required": false,
+      "description": "The supplier-server key for your payments user (read+write, no approve). On macOS it is put on the clipboard during sign-in so you can paste it into the sign-in page. Leave empty to paste it yourself."
+    },
+    "payer_account": {
+      "type": "string", "title": "Existing NEAR account (optional)", "required": false,
+      "description": "Leave empty to create a new wallet from the chat (wallet_create)."
+    },
+    "payer_private_key": {
+      "type": "string", "title": "Its private key (optional)", "sensitive": true, "required": false,
+      "description": "ed25519:... for the account above. Leave empty with a new wallet."
+    },
+    "per_payment_cap": {
+      "type": "number", "title": "Limit per payment (USD)", "required": false, "default": 50, "min": 0.01,
+      "description": "Purchase orders above this are refused, whatever was approved."
+    },
+    "daily_cap": {
+      "type": "number", "title": "Limit per day (USD)", "required": false, "default": 100, "min": 0.01,
+      "description": "Total paid per UTC day."
+    }
+  }
+}

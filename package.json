@@ -1,0 +1,39 @@
+{
+  "name": "supplier-inventory-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Code-mode MCP server that is a factory's purchasing memory: stock, BOMs, specs, documents, suppliers and a per-company wiki.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --disable-warning=ExperimentalWarning --env-file=.env.test --test --test-concurrency=1 \"test/**/*.test.ts\"",
+    "migrate": "node --disable-warning=ExperimentalWarning src/db/migrate-cli.ts",
+    "admin": "node --disable-warning=ExperimentalWarning src/admin/cli.ts",
+    "seed": "node --disable-warning=ExperimentalWarning src/seed/seed.ts",
+    "start": "node --disable-warning=ExperimentalWarning --max-old-space-size=256 src/main.ts",
+    "bridge": "node --disable-warning=ExperimentalWarning bridge/main.ts",
+    "sample-docs": "node --disable-warning=ExperimentalWarning scripts/make-sample-docs.ts",
+    "privacy-scan": "node --disable-warning=ExperimentalWarning scripts/privacy-scan.ts",
+    "smoke": "node --disable-warning=ExperimentalWarning scripts/smoke.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@napi-rs/keyring": "2.1.2",
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.1",
+    "libpg-query": "15.6.3",
+    "pg": "8.23.1",
+    "pgsql-deparser": "15.1.1",
+    "quickjs-emscripten": "0.32.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "typescript": "7.0.2"
+  }
+}

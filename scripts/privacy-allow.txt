@@ -1,0 +1,22 @@
+# Exact values the privacy scan accepts, one per line, each under its reason.
+# Only emails and IP addresses can be allowed; secrets and private terms never can.
+
+# Well-known public DNS resolvers and the old example.com address: test fixtures for
+# "this address is public" in the safe-fetch tests.
+8.8.8.8
+1.1.1.1
+9.9.9.9
+93.184.216.34
+2606:4700::1111
+2a00:1450::200e
+# A former fixture in the same tests (still in history): a random cloud address, not ours.
+35.200.0.1
+
+# A free-mail address: tests that free-mail domains are never treated as a supplier's domain.
+someone@gmail.com
+
+# The AI co-author trailer on commits.
+noreply@anthropic.com
+
+# GitHub's own address as committer of pull requests merged on github.com.
+noreply@github.com

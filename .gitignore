@@ -1,0 +1,42 @@
+# Brainstorming notes stay local (not committed)
+brainstorm/
+
+# Secrets
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Local privacy review inputs: never committed
+.privacy/
+
+# Dependencies and local data
+node_modules/
+.data/
+
+# Generated demo files
+sample-docs/
+
+# Local credentials, exports, build outputs, and validation artifacts
+.claude/
+.codex/
+.tokens/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+wallet-*.json
+*-keys.json
+*.bundle
+*.tar.gz
+*.zip
+*.mcpb
+dist/
+coverage/
+*.sarif
+.DS_Store
