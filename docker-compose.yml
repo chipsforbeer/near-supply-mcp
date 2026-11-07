@@ -1,0 +1,46 @@
+# Local demo only: fictional data, demo-only passwords, reachable from this machine only.
+#   docker compose up --build -d
+#   docker compose logs app        (the demo API keys are printed once, on the first start)
+#   docker compose down -v         (start over; the next first start prints new keys)
+name: near-supply-demo
+services:
+  db:
+    # Postgres 15 with the server's three roles. The init files are built into the image rather
+    # than bind-mounted, so this also works when Docker runs remotely or nested.
+    build:
+      context: .
+      dockerfile: docker/db.Dockerfile
+    environment:
+      POSTGRES_PASSWORD: demo-only-superuser
+      SIM_DB: supplier_inventory
+      SIM_OWNER_PASSWORD: demo-only-owner
+      SIM_APP_PASSWORD: demo-only-app
+      SIM_READ_PASSWORD: demo-only-read
+    volumes:
+      - demo-db:/var/lib/postgresql/data
+    healthcheck:
+      # over TCP: the image's temporary init server listens on a socket only, so this passes
+      # only once the roles exist and the real server is up
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d supplier_inventory"]
+      interval: 2s
+      retries: 30
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PUBLIC_ORIGIN: http://127.0.0.1:8790
+      LISTEN_HOST: 0.0.0.0
+      PORT: "8790"
+      DATABASE_URL_OWNER: postgres://sim_owner:demo-only-owner@db:5432/supplier_inventory
+      DATABASE_URL_APP: postgres://sim_app:demo-only-app@db:5432/supplier_inventory
+      DATABASE_URL_READ: postgres://sim_read:demo-only-read@db:5432/supplier_inventory
+      HMAC_SECRET: demo-only-hmac-secret-not-for-production-0001
+      SEED: "1"
+    ports:
+      - "127.0.0.1:8790:8790"
+
+volumes:
+  demo-db: {}

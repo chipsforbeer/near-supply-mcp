@@ -2,6 +2,7 @@
   "name": "near-payment-mcp",
   "version": "0.2.0",
   "description": "Pays approved purchase orders from the supplier-inventory MCP on NEAR (public testnet rail, confidential mainnet rail).",
+  "license": "MIT",
   "type": "module",
   "private": true,
   "engines": {
@@ -20,6 +21,7 @@
     "pack:mcpb": "scripts/pack-mcpb.sh",
     "balance": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local src/main.ts balance",
     "test:e2e": "E2E=1 node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local --test --test-concurrency=1 test/e2e/local-demo.test.ts",
+    "test:e2e:sim": "E2E_SIM=1 node --disable-warning=ExperimentalWarning --test --test-concurrency=1 test/e2e/local-sim.test.ts",
     "test:e2e:mainnet": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env.local --test --test-concurrency=1 test/e2e/confidential-mainnet.test.ts"
   },
   "dependencies": {

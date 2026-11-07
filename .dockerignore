@@ -1,0 +1,14 @@
+node_modules
+.data
+.git
+.github
+brainstorm
+sample-docs
+test
+docs
+bridge
+scripts
+payment-mcp
+*.log
+.env
+.env.*

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Code-mode MCP server that is a factory's purchasing memory: stock, BOMs, specs, documents, suppliers and a per-company wiki.",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -10,6 +11,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --disable-warning=ExperimentalWarning --env-file=.env.test --test --test-concurrency=1 \"test/**/*.test.ts\"",
+    "test:db:up": "docker compose -f docker-compose.test.yml up -d --wait",
+    "test:db:down": "docker compose -f docker-compose.test.yml down -v",
     "migrate": "node --disable-warning=ExperimentalWarning src/db/migrate-cli.ts",
     "admin": "node --disable-warning=ExperimentalWarning src/admin/cli.ts",
     "seed": "node --disable-warning=ExperimentalWarning src/seed/seed.ts",
@@ -17,7 +20,8 @@
     "bridge": "node --disable-warning=ExperimentalWarning bridge/main.ts",
     "sample-docs": "node --disable-warning=ExperimentalWarning scripts/make-sample-docs.ts",
     "privacy-scan": "node --disable-warning=ExperimentalWarning scripts/privacy-scan.ts",
-    "smoke": "node --disable-warning=ExperimentalWarning scripts/smoke.ts"
+    "smoke": "node --disable-warning=ExperimentalWarning scripts/smoke.ts",
+    "e2e:local": "sh scripts/e2e-local.sh"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

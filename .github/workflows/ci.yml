@@ -1,0 +1,65 @@
+# Everything a reviewer can run without NEAR accounts or funds, on a clean Linux machine.
+name: ci
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  supply-server:
+    name: supply server - typecheck, tests on Postgres 15, privacy scan
+    runs-on: ubuntu-latest
+    services:
+      pg:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test-only-password
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U postgres"
+          --health-interval 2s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the privacy scan also checks every commit
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run privacy-scan -- --history --without-private-terms
+
+  payment-mcp:
+    name: payment MCP - typecheck, unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: payment-mcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: payment-mcp/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck
+      - run: npm test
+
+  e2e-local:
+    name: e2e - local demo server, simulated NEAR chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: payment-mcp/package-lock.json
+      - run: sh scripts/e2e-local.sh
+      - if: failure()
+        run: docker compose logs

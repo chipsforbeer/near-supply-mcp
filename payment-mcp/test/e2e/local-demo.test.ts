@@ -1,6 +1,7 @@
-// End to end against the teammate's supplier server running locally (docker compose, fictional
-// Northbeck Metalworks) and real NEAR testnet. Opt-in: `npm run test:e2e`. Needs:
-//   - the demo server on http://127.0.0.1:8790 (docker compose up in supplier-inventory-mcp)
+// End to end against the supply server running locally (docker compose, fictional Northbeck
+// Metalworks) and real NEAR testnet. Opt-in: `npm run test:e2e`. The same flow with the chain
+// simulated, needing no accounts or funds, is local-sim.test.ts. Needs:
+//   - the demo server on http://127.0.0.1:8790 (docker compose up --build -d at the repo root)
 //   - demo keys in ~/.config/near-payment-mcp/local-demo-keys.txt (or SUPPLY_OWNER_KEY / SUPPLY_BUYER_KEY)
 //   - PAYER_ACCOUNT / PAYER_PRIVATE_KEY in .env.local, with >= 1 testnet USDC
 //   - RECEIVER_ACCOUNT: an existing testnet account that you control
