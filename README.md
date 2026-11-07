@@ -1,4 +1,4 @@
-# near-supply-mcp
+# Supply
 
 [![ci](https://github.com/chipsforbeer/near-supply-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/chipsforbeer/near-supply-mcp/actions/workflows/ci.yml)
 
@@ -376,10 +376,10 @@ Circle's testnet USDC faucet, NearBlocks for explorer links. Docker images `post
 
 ## AI use
 
-Most of the code, tests and documentation were written with Claude Code (Anthropic's Claude models)
-under the team's direction, from a design spec and implementation plan that were also drafted with
-it. The payment MCP's working-repository commits carry `Co-Authored-By: Claude` trailers; the import
-commit here squashes that history. The product itself calls no AI model: it is two MCP servers that
+Most of the code, tests and documentation were written with AI coding agents, Claude Code
+(Anthropic's Claude models) and Codex (OpenAI), under the team's direction, from a design spec and
+implementation plan that were also drafted with AI. The payment MCP's working-repository commits
+carry `Co-Authored-By: Claude` trailers; the import commit here squashes that history. The product itself calls no AI model: it is two MCP servers that
 an AI assistant uses.
 
 ## Hackathon scope
@@ -389,6 +389,11 @@ earlier product and no code from another chain. Development happened in two priv
 repositories, one for each part. This repository starts with a clean import of both as of
 2026-11-07, without the hosted deployment's configuration. The later commits add this README, the
 license, the local demo files, the simulated-chain e2e test and CI.
+
+**Other project by a team member (Q-015).** [chipsforbeer](https://github.com/chipsforbeer), on this
+team, also built [Logline](https://github.com/chipsforbeer/loglines) at NEAR HACKATHON as a solo
+project: prediction markets on on-chain metrics, settled on NEAR. It is a separate submission, and
+the two projects share no code.
 
 ## Repository layout
 
