@@ -14,8 +14,9 @@ brainstorm/
 node_modules/
 .data/
 
-# Generated demo files
+# Generated demo files (demo-keys.txt: the local demo's keys, see README)
 sample-docs/
+demo-keys.txt
 
 # Local credentials, exports, build outputs, and validation artifacts
 .claude/

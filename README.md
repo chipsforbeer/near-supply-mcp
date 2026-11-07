@@ -73,15 +73,16 @@ cannot let it while two things are missing:
 ## Try it
 
 No hosted server is needed. Everything runs on your machine against a local demo supply server
-holding two fictional companies, *Northbeck Metalworks* and *Lark Hill Foods*. You need Node 24 and,
-for most steps, Docker.
+with its own database, holding two fictional companies, *Northbeck Metalworks* and *Lark Hill
+Foods*. You need Node 24, and Docker or your own Postgres 15 or newer
+([without Docker](#without-docker-your-own-postgres)).
 
 | step | needs | you see |
 |---|---|---|
-| [1. Tests](#1-tests) | Node, Docker (or any Postgres 15) | 93 payment MCP tests and 202 supply server tests pass |
-| [2. Full flow, simulated chain](#2-the-whole-purchase-to-payment-flow-chain-simulated) | Node, Docker | an owner approves an order, the payment MCP pays it and records it on the order; a double payment and five kinds of bad payment are refused |
+| [1. Tests](#1-tests) | Node, Docker or your own Postgres | 93 payment MCP tests and 202 supply server tests pass |
+| [2. Full flow, simulated chain](#2-the-whole-purchase-to-payment-flow-chain-simulated) | Node, Docker or your own Postgres | an owner approves an order, the payment MCP pays it and records it on the order; a double payment and five kinds of bad payment are refused |
 | [3. A real NEAR payment](#3-check-a-real-payment-this-project-made) | curl, Node | a testnet payment this project made, read from the chain |
-| [4. With Claude Code](#4-with-claude-code) | Claude Code, Docker | low stock → RFQ → quotes checked against spec → approved PO → delivery received |
+| [4. With Claude Code](#4-with-claude-code) | Claude Code, Docker or your own Postgres | low stock → RFQ → quotes checked against spec → approved PO → delivery received |
 | [5. Real testnet payment](#5-real-payment-on-near-testnet) | free testnet accounts, testnet USDC from a web faucet | a real `ft_transfer`, checked on chain, in the receiver's balance and on the PO |
 | [6. Real mainnet payment](#6-private-payment-on-near-mainnet-real-money) | 0.50 USDC, a free 1Click API key | a confidential payment, checked from every side |
 
@@ -111,7 +112,8 @@ npm run test:db:down
 They include `test/e2e/demo-flow.test.ts`, the walkthrough of step 4 driven through the real bridge
 and sign-in, and `test/e2e/cross-company.test.ts`, which calls every operation as one company with
 another company's ids and checks each is refused exactly like a made-up id, with nothing leaked or
-changed. Without Docker, point the tests at any throwaway Postgres 15 superuser:
+changed. Without Docker, point the tests at any throwaway Postgres 15 or newer (tested on 15, 16,
+17 and 18) as a superuser:
 `PG_SUPERUSER_URL=postgres://postgres:<password>@127.0.0.1:5432/postgres npm test`. They create
 their own roles and drop and recreate the database `sim_test`.
 
@@ -154,6 +156,50 @@ SMOKE_KEY=$(docker compose logs --no-color app | awk '/owner@northbeck-metalwork
 
 `docker compose down -v` stops the demo and deletes its data. The demo keys are printed only on the
 first start of a fresh database, so start over that way if you lose them.
+
+### Without Docker: your own Postgres
+
+The demo supply server for steps 2, 4 and 5 also runs straight from this clone against your own
+database: any Postgres 15 or newer that you can reach as a superuser, such as a local install
+(tested on 15, 16, 17 and 18). Create the server's three roles and its database once:
+
+```bash
+psql "postgres://postgres:<password>@127.0.0.1:5432/postgres" \
+  -v owner_password=demo-only-owner -v app_password=demo-only-app -v read_password=demo-only-read \
+  -v dbname=supplier_inventory -f docker/roles.sql
+```
+
+Then start the server with Node 24. Every setting is an environment variable, checked at start-up
+(`src/config.ts`):
+
+```bash
+npm ci --ignore-scripts
+export PUBLIC_ORIGIN=http://127.0.0.1:8790 HMAC_SECRET=demo-only-hmac-secret-not-for-production-0001 \
+  DATABASE_URL_OWNER=postgres://sim_owner:demo-only-owner@127.0.0.1:5432/supplier_inventory \
+  DATABASE_URL_APP=postgres://sim_app:demo-only-app@127.0.0.1:5432/supplier_inventory \
+  DATABASE_URL_READ=postgres://sim_read:demo-only-read@127.0.0.1:5432/supplier_inventory
+npm run migrate                    # Applied: 001_core.sql, … 017_document_locations.sql
+npm run -s seed > demo-keys.txt    # the two fictional companies and their four demo keys, shown once
+npm start &                        # supplier-inventory listening on 127.0.0.1:8790 …
+```
+
+and run step 2's checks against it:
+
+```bash
+SMOKE_KEY=$(awk '/owner@northbeck/ { print $NF }' demo-keys.txt) \
+  npm run smoke -- --server http://127.0.0.1:8790          # … All smoke checks passed.
+cd payment-mcp && npm ci --ignore-scripts
+SUPPLY_OWNER_KEY=$(awk '/owner@northbeck/ { print $NF }' ../demo-keys.txt) \
+SUPPLY_BUYER_KEY=$(awk '/buyer@northbeck/ { print $NF }' ../demo-keys.txt) \
+  npm run test:e2e:sim                                       # ℹ tests 8 … ℹ pass 8
+```
+
+For step 4, the Northbeck owner key is in `demo-keys.txt` (gitignored). To start over:
+
+```bash
+psql "postgres://postgres:<password>@127.0.0.1:5432/postgres" \
+  -c 'DROP DATABASE IF EXISTS supplier_inventory WITH (FORCE)' -c 'DROP ROLE IF EXISTS sim_owner, sim_app, sim_read'
+```
 
 ### 3. Check a real payment this project made
 
