@@ -6,6 +6,8 @@ Purchasing and inventory records that an AI assistant works through, and supplie
 on NEAR that the assistant can only make for orders a human approved. Built at NEAR HACKATHON
 (November 2026).
 
+**Demo video:** https://x.com/moltycarlo/status/2119059565153325080
+
 Two MCP servers, one repository:
 
 | part | what it does | NEAR |
